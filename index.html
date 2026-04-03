@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나라 위치 찾기 게임</title>
+
+  <!-- jsVectorMap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: linear-gradient(135deg, #eef6ff, #f9fbff);
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      color: #0f172a;
+    }
+
+    .header p {
+      margin: 0;
+      color: #475569;
+      font-size: 1rem;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0 16px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e5eef8;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      line-height: 1.5;
+    }
+
+    .question-text .country-name {
+      color: #2563eb;
+      margin-left: 8px;
+    }
+
+    .big-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .status {
+      margin: 18px 0;
+      padding: 14px 18px;
+      border-radius: 14px;
+      text-align: center;
+      font-weight: 700;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.25s ease;
+    }
+
+    .status.info {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      color: #075985;
+    }
+
+    .status.success {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .status.error {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .btn-start {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-restart {
+      background: #0f766e;
+      color: white;
+    }
+
+    .btn-hint {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .map-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e5eef8;
+    }
+
+    #map {
+      width: 100%;
+      height: 620px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #dbeafe;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #map {
+        height: 480px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 14px;
+      }
+
+      .header h1 {
+        font-size: 1.6rem;
+      }
+
+      .question-text,
+      .big-text {
+        font-size: 1.15rem;
+      }
+
+      #map {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌍 나라 위치 찾기 게임</h1>
+      <p>문제로 제시된 나라를 세계지도에서 클릭하세요. 맞히면 다음 문제로 넘어갑니다.</p>
+    </div>
+
+    <div class="panel-grid">
+      <div class="card">
+        <div class="card-title">현재 문제</div>
+        <div class="question-text">
+          나라:
+          <span class="country-name" id="target-country">게임 시작 버튼을 누르세요</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">점수</div>
+        <div class="big-text" id="score">0점</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">진행 상황</div>
+        <div class="big-text" id="progress">0 / 0</div>
+      </div>
+    </div>
+
+    <div id="status" class="status info">게임을 시작하면 나라 이름이 나옵니다.</div>
+
+    <div class="controls">
+      <button class="btn-start" onclick="startGame()">게임 시작</button>
+      <button class="btn-restart" onclick="restartGame()">다시 시작</button>
+      <button class="btn-hint" onclick="showHint()">힌트 보기</button>
+    </div>
+
+    <div class="map-card">
+      <div id="map"></div>
+      <div class="footer-note">
+        정답이면 자동으로 다음 문제로 넘어갑니다.<br />
+        틀리면 다시 시도할 수 있습니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- jsVectorMap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+
+  <script>
+    const quizPool = [
+      { code: "KR", name: "대한민국", hint: "동아시아에 있으며 한반도 남쪽에 있습니다." },
+      { code: "JP", name: "일본", hint: "대한민국의 동쪽 바다 건너에 있는 섬나라입니다." },
+      { code: "CN", name: "중국", hint: "대한민국의 서쪽에 있는 아주 큰 나라입니다." },
+      { code: "US", name: "미국", hint: "북아메리카 대륙에 있는 큰 나라입니다." },
+      { code: "CA", name: "캐나다", hint: "미국의 북쪽에 있는 넓은 나라입니다." },
+      { code: "BR", name: "브라질", hint: "남아메리카에서 가장 큰 나라입니다." },
+      { code: "AR", name: "아르헨티나", hint: "남아메리카의 남쪽에 있는 나라입니다." },
+      { code: "MX", name: "멕시코", hint: "미국의 남쪽에 있습니다." },
+      { code: "GB", name: "영국", hint: "유럽 서쪽 바다 건너 섬나라입니다." },
+      { code: "FR", name: "프랑스", hint: "서유럽에 있으며 파리로 유명합니다." },
+      { code: "DE", name: "독일", hint: "유럽 중앙에 있는 나라입니다." },
+      { code: "IT", name: "이탈리아", hint: "장화 모양으로 자주 표현되는 나라입니다." },
+      { code: "ES", name: "스페인", hint: "유럽 남서쪽 이베리아반도에 있습니다." },
+      { code: "RU", name: "러시아", hint: "유라시아 북부에 걸쳐 있는 매우 큰 나라입니다." },
+      { code: "IN", name: "인도", hint: "남아시아에 있는 큰 나라입니다." },
+      { code: "AU", name: "호주", hint: "남반구의 큰 대륙 국가입니다." },
+      { code: "NZ", name: "뉴질랜드", hint: "호주의 동남쪽 바다에 있는 섬나라입니다." },
+      { code: "ZA", name: "남아프리카공화국", hint: "아프리카 대륙의 남쪽 끝에 있습니다." },
+      { code: "EG", name: "이집트", hint: "아프리카 북동부, 피라미드로 유명합니다." },
+      { code: "SA", name: "사우디아라비아", hint: "중동의 아라비아반도에 있는 큰 나라입니다." },
+      { code: "TR", name: "튀르키예", hint: "유럽과 아시아를 잇는 위치에 있습니다." },
+      { code: "ID", name: "인도네시아", hint: "동남아시아의 많은 섬으로 이루어진 나라입니다." },
+      { code: "TH", name: "태국", hint: "동남아시아에 있으며 수도는 방콕입니다." },
+      { code: "VN", name: "베트남", hint: "동남아시아에서 남북으로 길게 뻗은 나라입니다." }
+    ];
+
+    let map;
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let gameStarted = false;
+    let locked = false;
+
+    const targetCountryEl = document.getElementById("target-country");
+    const scoreEl = document.getElementById("score");
+    const progressEl = document.getElementById("progress");
+    const statusEl = document.getElementById("status");
+
+    function shuffle(array) {
+      const copied = [...array];
+      for (let i = copied.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copied[i], copied[j]] = [copied[j], copied[i]];
+      }
+      return copied;
+    }
+
+    function setStatus(message, type = "info") {
+      statusEl.className = "status " + type;
+      statusEl.textContent = message;
+    }
+
+    function updateUI() {
+      if (!gameStarted || !questions[currentIndex]) {
+        targetCountryEl.textContent = "게임 시작 버튼을 누르세요";
+      } else {
+        targetCountryEl.textContent = questions[currentIndex].name;
+      }
+
+      scoreEl.textContent = score + "점";
+      progressEl.textContent = Math.min(currentIndex, questions.length) + " / " + questions.length;
+    }
+
+    function startGame() {
+      questions = shuffle(quizPool);
+      currentIndex = 0;
+      score = 0;
+      gameStarted = true;
+      locked = false;
+      updateUI();
+      setStatus("지도의 나라를 클릭해 보세요!", "info");
+    }
+
+    function restartGame() {
+      startGame();
+      setStatus("새 게임이 시작되었습니다!", "info");
+    }
+
+    function finishGame() {
+      gameStarted = false;
+      locked = false;
+      targetCountryEl.textContent = "게임 종료";
+      progressEl.textContent = questions.length + " / " + questions.length;
+      setStatus("🎉 게임 완료! 최종 점수: " + score + " / " + questions.length, "success");
+    }
+
+    function nextQuestion() {
+      if (currentIndex >= questions.length) {
+        finishGame();
+        return;
+      }
+      updateUI();
+      setStatus("다음 나라를 찾아 클릭하세요!", "info");
+    }
+
+    function showHint() {
+      if (!gameStarted || !questions[currentIndex]) {
+        setStatus("먼저 게임을 시작하세요.", "error");
+        return;
+      }
+      setStatus("힌트: " + questions[currentIndex].hint, "info");
+    }
+
+    function handleRegionClick(code) {
+      if (!gameStarted) {
+        setStatus("먼저 게임 시작 버튼을 눌러 주세요.", "error");
+        return;
+      }
+
+      if (locked) return;
+
+      const current = questions[currentIndex];
+      if (!current) return;
+
+      if (code === current.code) {
+        locked = true;
+        score++;
+        currentIndex++;
+        updateUI();
+        setStatus("✅ 정답입니다!", "success");
+
+        setTimeout(function () {
+          locked = false;
+          if (currentIndex >= questions.length) {
+            finishGame();
+          } else {
+            nextQuestion();
+          }
+        }, 900);
+      } else {
+        setStatus("❌ 틀렸어요. 다시 찾아보세요.", "error");
+      }
+    }
+
+    function initMap() {
+      map = new jsVectorMap({
+        selector: "#map",
+        map: "world",
+        zoomButtons: true,
+        zoomOnScroll: true,
+        backgroundColor: "#dbeafe",
+        regionStyle: {
+          initial: {
+            fill: "#93c5fd",
+            stroke: "#ffffff",
+            strokeWidth: 1
+          },
+          hover: {
+            fill: "#2563eb",
+            cursor: "pointer"
+          },
+          selected: {
+            fill: "#22c55e"
+          }
+        },
+        onRegionClick: function (event, code) {
+          handleRegionClick(code);
+        }
+      });
+    }
+
+    initMap();
+    updateUI();
+  </script>
+</body>
+</html>
