@@ -3,100 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>나라 위치 찾기 게임</title>
-
-  <!-- jsVectorMap CSS -->
+  <title>국가 위치 찾기 게임</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, #eef6ff, #f9fbff);
       color: #1f2937;
+      background:
+        radial-gradient(circle at top left, #dbeafe 0%, transparent 28%),
+        radial-gradient(circle at top right, #ede9fe 0%, transparent 24%),
+        linear-gradient(135deg, #f8fbff 0%, #eef7ff 45%, #fcfcff 100%);
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1320px;
       margin: 0 auto;
       padding: 24px;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .header h1 {
-      margin: 0 0 10px;
-      font-size: 2rem;
+      margin: 0 0 8px;
+      font-size: 2.2rem;
       color: #0f172a;
     }
 
     .header p {
       margin: 0;
       color: #475569;
+      line-height: 1.7;
       font-size: 1rem;
     }
 
-    .panel-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
-      gap: 16px;
-      margin: 24px 0 16px;
-    }
-
-    .card {
-      background: #ffffff;
+    .score-rule {
+      max-width: 860px;
+      margin: 16px auto 18px;
+      padding: 14px 18px;
       border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      border: 1px solid #e5eef8;
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #475569;
-      margin-bottom: 10px;
-    }
-
-    .question-text {
-      font-size: 1.35rem;
+      background: linear-gradient(135deg, #eff6ff, #f8fafc);
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
       font-weight: 800;
-      color: #0f172a;
-      min-height: 60px;
+      text-align: center;
+      line-height: 1.7;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+    }
+
+    .top-controls {
       display: flex;
-      align-items: center;
-      line-height: 1.5;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 18px 0 14px;
     }
 
-    .question-text .country-name {
-      color: #2563eb;
-      margin-left: 8px;
-    }
-
-    .big-text {
-      font-size: 1.4rem;
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 1rem;
       font-weight: 800;
-      color: #0f172a;
+      cursor: pointer;
+      transition: 0.18s ease;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn-start {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-restart {
+      background: #0f766e;
+      color: white;
     }
 
     .status {
-      margin: 18px 0;
+      margin: 0 0 14px;
       padding: 14px 18px;
-      border-radius: 14px;
+      border-radius: 16px;
       text-align: center;
-      font-weight: 700;
-      min-height: 56px;
+      font-weight: 800;
+      min-height: 58px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: 0.25s ease;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      line-height: 1.6;
     }
 
     .status.info {
@@ -117,94 +123,235 @@
       color: #991b1b;
     }
 
-    .controls {
-      display: flex;
-      justify-content: center;
+    .summary-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 12px 20px;
-      font-size: 1rem;
+    .summary-item {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #dbe7f5;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.05);
+    }
+
+    .summary-label {
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .country-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 1px solid #dce9f7;
+      border-radius: 26px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+      overflow: hidden;
+      position: sticky;
+      top: 16px;
+    }
+
+    .card-top {
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 55%, #38bdf8 100%);
+      color: white;
+      padding: 22px 22px 18px;
+    }
+
+    .flag-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .flag-image-box {
+      width: 88px;
+      height: 62px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 14px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22);
+      flex-shrink: 0;
+    }
+
+    .flag-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+      background: white;
+      display: block;
+    }
+
+    .country-main-text h2 {
+      margin: 0;
+      font-size: 1.58rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .country-sub {
+      margin-top: 7px;
+      font-size: 0.98rem;
+      opacity: 0.96;
+      line-height: 1.6;
+    }
+
+    .card-body {
+      padding: 18px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .info-box {
+      background: #f8fbff;
+      border: 1px solid #e1ecf7;
+      border-radius: 18px;
+      padding: 12px 13px;
+      min-height: 92px;
+    }
+
+    .info-box.wide {
+      grid-column: 1 / -1;
+      min-height: auto;
+    }
+
+    .info-box .label {
+      font-size: 0.82rem;
+      color: #64748b;
       font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .info-box .value {
+      color: #0f172a;
+      font-weight: 800;
+      line-height: 1.6;
+      font-size: 0.96rem;
+      word-break: keep-all;
+    }
+
+    .hint-box {
       cursor: pointer;
-      transition: 0.18s ease;
+      background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+      border: 1px solid #fed7aa;
+      transition: 0.2s;
     }
 
-    button:hover {
+    .hint-box:hover {
       transform: translateY(-1px);
-      opacity: 0.95;
+      box-shadow: 0 8px 18px rgba(245, 158, 11, 0.10);
     }
 
-    .btn-start {
-      background: #2563eb;
-      color: white;
+    .hint-box .label {
+      color: #9a3412;
     }
 
-    .btn-restart {
-      background: #0f766e;
-      color: white;
+    .hint-box .value {
+      color: #7c2d12;
     }
 
-    .btn-hint {
-      background: #f59e0b;
-      color: white;
+    .hint-closed {
+      font-weight: 900;
     }
 
-    .map-card {
-      background: #ffffff;
-      border-radius: 20px;
+    .hint-hidden-text {
+      display: none;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #fdba74;
+      line-height: 1.75;
+    }
+
+    .hint-box.open .hint-hidden-text {
+      display: block;
+    }
+
+    .map-panel {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid #dce9f7;
+      border-radius: 26px;
       padding: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      border: 1px solid #e5eef8;
+      box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
     }
 
     #map {
       width: 100%;
-      height: 620px;
-      border-radius: 14px;
+      height: 760px;
+      border-radius: 18px;
       overflow: hidden;
       background: #dbeafe;
     }
 
-    .footer-note {
-      margin-top: 14px;
+    .map-note {
+      margin-top: 12px;
       text-align: center;
       color: #64748b;
+      line-height: 1.7;
       font-size: 0.95rem;
-      line-height: 1.6;
     }
 
-    @media (max-width: 900px) {
-      .panel-grid {
+    .footer-note {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    @media (max-width: 1100px) {
+      .main-grid {
         grid-template-columns: 1fr;
       }
-
+      .country-card {
+        position: static;
+      }
       #map {
-        height: 480px;
+        height: 560px;
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 720px) {
       .container {
         padding: 14px;
       }
-
-      .header h1 {
-        font-size: 1.6rem;
+      .summary-bar {
+        grid-template-columns: 1fr;
       }
-
-      .question-text,
-      .big-text {
-        font-size: 1.15rem;
+      .info-grid {
+        grid-template-columns: 1fr;
       }
-
+      .country-main-text h2 {
+        font-size: 1.34rem;
+      }
       #map {
-        height: 380px;
+        height: 420px;
+      }
+      .flag-image-box {
+        width: 78px;
+        height: 56px;
       }
     }
   </style>
@@ -212,184 +359,867 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🌍 나라 위치 찾기 게임</h1>
-      <p>문제로 제시된 나라를 세계지도에서 클릭하세요. 맞히면 다음 문제로 넘어갑니다.</p>
+      <h1>🌍 국가 위치 찾기 게임</h1>
+      <p>
+        국가 카드를 읽고, 해당 국가를 세계지도에서 클릭하세요.<br />
+        전체 35개국 중 매번 랜덤하게 20개국이 출제됩니다.
+      </p>
     </div>
 
-    <div class="panel-grid">
-      <div class="card">
-        <div class="card-title">현재 문제</div>
-        <div class="question-text">
-          나라:
-          <span class="country-name" id="target-country">게임 시작 버튼을 누르세요</span>
+    <div class="score-rule">
+      점수 규칙: <strong>힌트를 보지 않고 정답을 맞히면 5점</strong>,
+      <strong>힌트를 보고 정답을 맞히면 4점</strong>입니다.
+    </div>
+
+    <div class="top-controls">
+      <button class="btn-start" onclick="startGame()">게임 시작</button>
+      <button class="btn-restart" onclick="restartGame()">다시 시작</button>
+    </div>
+
+    <div id="status" class="status info">
+      게임을 시작하면 국가 카드가 제시됩니다.
+    </div>
+
+    <div class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-label">진행상황</div>
+        <div class="summary-value" id="progress">0 / 20</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">점수</div>
+        <div class="summary-value" id="score">0점</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">경과 시간</div>
+        <div class="summary-value">⏱ <span id="timer">00:00</span></div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="country-card">
+        <div class="card-top">
+          <div class="flag-wrap">
+            <div class="flag-image-box">
+              <img id="card-flag-img" src="" alt="국기 이미지" />
+            </div>
+            <div class="country-main-text">
+              <h2 id="card-name">어느 나라일까요?</h2>
+              <div class="country-sub" id="card-sub">
+                국기와 국가 정보를 읽고 지도에서 맞는 나라를 클릭해 보세요.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-box">
+              <div class="label">수도 / 수도의 기후</div>
+              <div class="value" id="card-capital">-</div>
+            </div>
+
+            <div class="info-box">
+              <div class="label">언어</div>
+              <div class="value" id="card-language">-</div>
+            </div>
+
+            <div class="info-box">
+              <div class="label">인구</div>
+              <div class="value" id="card-population">-</div>
+            </div>
+
+            <div class="info-box">
+              <div class="label">면적</div>
+              <div class="value" id="card-area">-</div>
+            </div>
+
+            <div class="info-box wide">
+              <div class="label">종교·문화 전통</div>
+              <div class="value" id="card-religion">-</div>
+            </div>
+
+            <div class="info-box wide">
+              <div class="label">대표 음식</div>
+              <div class="value" id="card-food">-</div>
+            </div>
+
+            <div class="info-box wide">
+              <div class="label">대표 축제·행사</div>
+              <div class="value" id="card-festival">-</div>
+            </div>
+
+            <div class="info-box wide hint-box" id="hintBox" onclick="toggleHintBox()">
+              <div class="label">위치 힌트</div>
+              <div class="value">
+                <div class="hint-closed" id="hintClosedText">클릭해서 위치 힌트 보기</div>
+                <div class="hint-hidden-text" id="hintHiddenText">-</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">점수</div>
-        <div class="big-text" id="score">0점</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">진행 상황</div>
-        <div class="big-text" id="progress">0 / 0</div>
+      <div class="map-panel">
+        <div id="map"></div>
+        <div class="map-note">
+          카드 정보를 읽고 나라를 추론해 보세요.<br />
+          정말 어려울 때만 위치 힌트를 눌러 보세요.
+        </div>
       </div>
     </div>
 
-    <div id="status" class="status info">게임을 시작하면 나라 이름이 나옵니다.</div>
-
-    <div class="controls">
-      <button class="btn-start" onclick="startGame()">게임 시작</button>
-      <button class="btn-restart" onclick="restartGame()">다시 시작</button>
-      <button class="btn-hint" onclick="showHint()">힌트 보기</button>
-    </div>
-
-    <div class="map-card">
-      <div id="map"></div>
-      <div class="footer-note">
-        정답이면 자동으로 다음 문제로 넘어갑니다.<br />
-        틀리면 다시 시도할 수 있습니다.
-      </div>
+    <div class="footer-note">
+      정답이면 자동으로 다음 문제로 넘어가고, 틀리면 같은 문제를 다시 풀게 됩니다.
     </div>
   </div>
 
-  <!-- jsVectorMap JS -->
   <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
-
   <script>
+    const GAME_SIZE = 20;
+
     const quizPool = [
-      { code: "KR", name: "대한민국", hint: "동아시아에 있으며 한반도 남쪽에 있습니다." },
-      { code: "JP", name: "일본", hint: "대한민국의 동쪽 바다 건너에 있는 섬나라입니다." },
-      { code: "CN", name: "중국", hint: "대한민국의 서쪽에 있는 아주 큰 나라입니다." },
-      { code: "US", name: "미국", hint: "북아메리카 대륙에 있는 큰 나라입니다." },
-      { code: "CA", name: "캐나다", hint: "미국의 북쪽에 있는 넓은 나라입니다." },
-      { code: "BR", name: "브라질", hint: "남아메리카에서 가장 큰 나라입니다." },
-      { code: "AR", name: "아르헨티나", hint: "남아메리카의 남쪽에 있는 나라입니다." },
-      { code: "MX", name: "멕시코", hint: "미국의 남쪽에 있습니다." },
-      { code: "GB", name: "영국", hint: "유럽 서쪽 바다 건너 섬나라입니다." },
-      { code: "FR", name: "프랑스", hint: "서유럽에 있으며 파리로 유명합니다." },
-      { code: "DE", name: "독일", hint: "유럽 중앙에 있는 나라입니다." },
-      { code: "IT", name: "이탈리아", hint: "장화 모양으로 자주 표현되는 나라입니다." },
-      { code: "ES", name: "스페인", hint: "유럽 남서쪽 이베리아반도에 있습니다." },
-      { code: "RU", name: "러시아", hint: "유라시아 북부에 걸쳐 있는 매우 큰 나라입니다." },
-      { code: "IN", name: "인도", hint: "남아시아에 있는 큰 나라입니다." },
-      { code: "AU", name: "호주", hint: "남반구의 큰 대륙 국가입니다." },
-      { code: "NZ", name: "뉴질랜드", hint: "호주의 동남쪽 바다에 있는 섬나라입니다." },
-      { code: "ZA", name: "남아프리카공화국", hint: "아프리카 대륙의 남쪽 끝에 있습니다." },
-      { code: "EG", name: "이집트", hint: "아프리카 북동부, 피라미드로 유명합니다." },
-      { code: "SA", name: "사우디아라비아", hint: "중동의 아라비아반도에 있는 큰 나라입니다." },
-      { code: "TR", name: "튀르키예", hint: "유럽과 아시아를 잇는 위치에 있습니다." },
-      { code: "ID", name: "인도네시아", hint: "동남아시아의 많은 섬으로 이루어진 나라입니다." },
-      { code: "TH", name: "태국", hint: "동남아시아에 있으며 수도는 방콕입니다." },
-      { code: "VN", name: "베트남", hint: "동남아시아에서 남북으로 길게 뻗은 나라입니다." }
+      {
+        code:"KR",
+        name:"대한민국",
+        capital:"서울",
+        capitalClimate:"냉대동계건조기후(Dwa)",
+        population:"약 5,100만 명",
+        populationRank:29,
+        area:"100,210㎢",
+        areaRank:107,
+        language:"한국어",
+        religion:"불교·개신교·천주교 등 다양한 종교가 공존",
+        food:"비빔밥, 김치, 불고기",
+        festival:"보령머드축제, 진주남강유등축제",
+        hint:"아시아 동쪽의 한반도 남부에 있다. 북쪽으로 북한과 접하며, 동쪽은 동해, 서쪽은 황해와 맞닿아 있다."
+      },
+      {
+        code:"JP",
+        name:"일본",
+        capital:"도쿄",
+        capitalClimate:"온난습윤기후(Cfa)",
+        population:"약 1억 2,300만 명",
+        populationRank:11,
+        area:"377,975㎢",
+        areaRank:61,
+        language:"일본어",
+        religion:"신토와 불교의 영향이 크다",
+        food:"스시, 라멘, 덴푸라",
+        festival:"기온 마쓰리, 삿포로 눈축제",
+        hint:"동아시아의 섬나라이다. 대한민국의 동쪽 바다 건너에 있으며, 홋카이도·혼슈·시코쿠·규슈로 이루어진다."
+      },
+      {
+        code:"CN",
+        name:"중국",
+        capital:"베이징",
+        capitalClimate:"냉대동계건조기후(Dwa)",
+        population:"약 14억 명",
+        populationRank:2,
+        area:"9,596,961㎢",
+        areaRank:3,
+        language:"중국어(표준중국어)",
+        religion:"불교·도교·민간신앙 등 다양",
+        food:"북경오리, 마라요리, 딤섬",
+        festival:"춘절, 중추절",
+        hint:"동아시아의 거대한 나라이다. 몽골, 러시아, 인도 등 매우 많은 나라와 국경을 맞댄다."
+      },
+      {
+        code:"IN",
+        name:"인도",
+        capital:"뉴델리",
+        capitalClimate:"온난습윤기후(Cwa)",
+        population:"약 14억 5천만 명",
+        populationRank:1,
+        area:"3,287,263㎢",
+        areaRank:7,
+        language:"힌디어, 영어 등",
+        religion:"힌두교 비중이 높고 이슬람교·시크교 등도 존재",
+        food:"커리, 난, 비리야니",
+        festival:"디왈리, 홀리",
+        hint:"남아시아의 큰 반도 국가이다. 파키스탄, 중국, 네팔, 방글라데시 등과 접한다."
+      },
+      {
+        code:"PH",
+        name:"필리핀",
+        capital:"마닐라",
+        capitalClimate:"열대몬순기후(Am)",
+        population:"약 1억 1,700만 명",
+        populationRank:12,
+        area:"300,000㎢",
+        areaRank:73,
+        language:"필리핀어, 영어",
+        religion:"가톨릭교 비중이 매우 높다",
+        food:"아도보, 시니강, 레촌",
+        festival:"시눌로그 축제, 아티아티한 축제",
+        hint:"동남아시아의 군도 국가이다. 남중국해와 필리핀해 사이에 있으며, 베트남의 동쪽에 있다."
+      },
+      {
+        code:"KZ",
+        name:"카자흐스탄",
+        capital:"아스타나",
+        capitalClimate:"냉대습윤기후(Dfb)",
+        population:"약 2,000만 명",
+        populationRank:64,
+        area:"2,724,900㎢",
+        areaRank:9,
+        language:"카자흐어, 러시아어",
+        religion:"이슬람교가 다수이며 러시아 정교 문화도 일부 존재",
+        food:"베쉬바르막",
+        festival:"나우르즈",
+        hint:"중앙아시아의 매우 넓은 내륙국이다. 러시아와 중국 사이에 있으며 카스피해와도 가깝다."
+      },
+      {
+        code:"UZ",
+        name:"우즈베키스탄",
+        capital:"타슈켄트",
+        capitalClimate:"지중해성기후(Csa)",
+        population:"약 3,700만 명",
+        populationRank:36,
+        area:"448,978㎢",
+        areaRank:56,
+        language:"우즈베크어",
+        religion:"이슬람교가 중심",
+        food:"플로브",
+        festival:"나우르즈",
+        hint:"중앙아시아의 내륙국이다. 카자흐스탄, 키르기스스탄, 타지키스탄, 투르크메니스탄, 아프가니스탄과 접한다."
+      },
+      {
+        code:"FR",
+        name:"프랑스",
+        capital:"파리",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 6,800만 명",
+        populationRank:21,
+        area:"551,695㎢",
+        areaRank:42,
+        language:"프랑스어",
+        religion:"가톨릭 문화 전통의 영향이 크다",
+        food:"바게트, 크루아상, 라타투이",
+        festival:"니스 카니발, 바스티유 데이",
+        hint:"서유럽에 있다. 스페인, 벨기에, 독일, 이탈리아 등과 가깝고 대서양과 지중해를 모두 접한다."
+      },
+      {
+        code:"DE",
+        name:"독일",
+        capital:"베를린",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 8,400만 명",
+        populationRank:19,
+        area:"357,114㎢",
+        areaRank:62,
+        language:"독일어",
+        religion:"가톨릭·개신교 전통",
+        food:"소시지, 슈니첼, 프레첼",
+        festival:"옥토버페스트, 크리스마스 마켓",
+        hint:"중앙유럽에 있다. 프랑스, 폴란드, 오스트리아, 네덜란드 등 여러 나라와 접한다."
+      },
+      {
+        code:"GB",
+        name:"영국",
+        capital:"런던",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 6,900만 명",
+        populationRank:20,
+        area:"243,610㎢",
+        areaRank:78,
+        language:"영어",
+        religion:"기독교 문화 전통",
+        food:"피시 앤 칩스, 로스트비프",
+        festival:"노팅힐 카니발",
+        hint:"유럽 대륙 서쪽의 섬나라이다. 프랑스와는 해협을 사이에 두고 마주 본다."
+      },
+      {
+        code:"BE",
+        name:"벨기에",
+        capital:"브뤼셀",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 1,200만 명",
+        populationRank:82,
+        area:"30,528㎢",
+        areaRank:136,
+        language:"네덜란드어, 프랑스어, 독일어",
+        religion:"가톨릭 문화 전통이 강하다",
+        food:"와플, 감자튀김, 홍합요리",
+        festival:"브뤼셀 플라워 카펫",
+        hint:"서유럽의 작은 나라이다. 프랑스, 네덜란드, 독일과 가깝고 EU 본부가 있는 나라로 유명하다. 언어권 갈등으로도 알려져 있다."
+      },
+      {
+        code:"IT",
+        name:"이탈리아",
+        capital:"로마",
+        capitalClimate:"지중해성기후(Csa)",
+        population:"약 5,900만 명",
+        populationRank:25,
+        area:"301,340㎢",
+        areaRank:72,
+        language:"이탈리아어",
+        religion:"가톨릭의 영향이 매우 크다",
+        food:"피자, 파스타, 리소토",
+        festival:"베네치아 카니발",
+        hint:"남유럽의 장화 모양 반도 국가이다. 북쪽은 알프스, 남쪽은 지중해와 맞닿아 있다."
+      },
+      {
+        code:"ES",
+        name:"스페인",
+        capital:"마드리드",
+        capitalClimate:"스텝기후(BSk)",
+        population:"약 4,900만 명",
+        populationRank:30,
+        area:"505,992㎢",
+        areaRank:51,
+        language:"스페인어",
+        religion:"가톨릭 문화 전통",
+        food:"빠에야, 타파스, 하몽",
+        festival:"라 토마티나, 산 페르민",
+        hint:"이베리아반도에 있다. 서쪽에 포르투갈, 북쪽 너머에 프랑스가 있다."
+      },
+      {
+        code:"TR",
+        name:"튀르키예",
+        capital:"앙카라",
+        capitalClimate:"스텝기후(BSk)",
+        population:"약 8,700만 명",
+        populationRank:18,
+        area:"783,562㎢",
+        areaRank:36,
+        language:"터키어",
+        religion:"이슬람교가 중심",
+        food:"케밥, 바클라바",
+        festival:"라마단, 공화국 기념행사",
+        hint:"유럽과 아시아를 잇는 나라이다. 흑해와 지중해 사이에 있으며 그리스, 불가리아와도 가깝다."
+      },
+      {
+        code:"GR",
+        name:"그리스",
+        capital:"아테네",
+        capitalClimate:"지중해성기후(Csa)",
+        population:"약 1,000만 명",
+        populationRank:99,
+        area:"131,957㎢",
+        areaRank:95,
+        language:"그리스어",
+        religion:"그리스 정교 전통이 강하다",
+        food:"수블라키, 무사카",
+        festival:"아테네·에피다우로스 축제",
+        hint:"남유럽 발칸반도 끝쪽에 있다. 에게해와 지중해에 많은 섬을 가진 나라이다."
+      },
+      {
+        code:"EG",
+        name:"이집트",
+        capital:"카이로",
+        capitalClimate:"사막기후(BWh)",
+        population:"약 1억 1,500만 명",
+        populationRank:14,
+        area:"1,001,450㎢",
+        areaRank:29,
+        language:"아랍어",
+        religion:"이슬람교가 다수",
+        food:"코샤리, 풀 메담스",
+        festival:"샴 엘네심",
+        hint:"아프리카 북동부에 있다. 나일강과 수에즈운하, 지중해와 홍해가 핵심 위치 단서이다."
+      },
+      {
+        code:"ZA",
+        name:"남아프리카공화국",
+        capital:"프리토리아",
+        capitalClimate:"온난습윤기후(Cwa)",
+        population:"약 6,300만 명",
+        populationRank:24,
+        area:"1,221,037㎢",
+        areaRank:24,
+        language:"영어, 줄루어, 아프리칸스어 등",
+        religion:"기독교 비중이 높다",
+        food:"브라이, 보보티",
+        festival:"케이프타운 민스트럴 카니발",
+        hint:"아프리카 대륙의 남쪽 끝에 있다. 대서양과 인도양을 모두 접한다."
+      },
+      {
+        code:"KE",
+        name:"케냐",
+        capital:"나이로비",
+        capitalClimate:"온난고산기후(Cwb)",
+        population:"약 5,600만 명",
+        populationRank:26,
+        area:"580,367㎢",
+        areaRank:48,
+        language:"스와힐리어, 영어",
+        religion:"기독교가 다수",
+        food:"우갈리, 냐마초마",
+        festival:"라마 문화축제",
+        hint:"동아프리카에 있다. 인도양을 접하고 탄자니아, 우간다, 에티오피아와 가깝다."
+      },
+      {
+        code:"NG",
+        name:"나이지리아",
+        capital:"아부자",
+        capitalClimate:"열대사바나기후(Aw)",
+        population:"약 2억 3천만 명",
+        populationRank:6,
+        area:"923,768㎢",
+        areaRank:31,
+        language:"영어",
+        religion:"이슬람교와 기독교 비중이 모두 크다",
+        food:"졸로프 라이스, 수야",
+        festival:"오순 오소그보 축제",
+        hint:"서아프리카의 큰 나라이다. 기니만에 접하며 니제르, 차드, 카메룬과 가깝다."
+      },
+      {
+        code:"MA",
+        name:"모로코",
+        capital:"라바트",
+        capitalClimate:"지중해성기후(Csa)",
+        population:"약 3,800만 명",
+        populationRank:38,
+        area:"446,550㎢",
+        areaRank:40,
+        language:"아랍어, 베르베르어",
+        religion:"이슬람교",
+        food:"타진, 쿠스쿠스",
+        festival:"페스 세계성음악축제",
+        hint:"아프리카 북서쪽 끝에 있다. 스페인과 지브롤터 해협을 사이에 둔다."
+      },
+      {
+        code:"SA",
+        name:"사우디아라비아",
+        capital:"리야드",
+        capitalClimate:"사막기후(BWh)",
+        population:"약 3,700만 명",
+        populationRank:40,
+        area:"2,149,690㎢",
+        areaRank:12,
+        language:"아랍어",
+        religion:"이슬람교의 중심지",
+        food:"캅사",
+        festival:"리야드 시즌",
+        hint:"아라비아반도의 대부분을 차지하는 나라이다. 홍해와 페르시아만 사이에 있다."
+      },
+      {
+        code:"AE",
+        name:"아랍에미리트",
+        capital:"아부다비",
+        capitalClimate:"사막기후(BWh)",
+        population:"약 1,000만 명",
+        populationRank:93,
+        area:"83,600㎢",
+        areaRank:114,
+        language:"아랍어",
+        religion:"이슬람교",
+        food:"샤와르마, 루카이맛",
+        festival:"두바이 쇼핑 페스티벌",
+        hint:"중동에 있다. 사우디아라비아와 오만 사이, 페르시아만 연안에 위치한다."
+      },
+      {
+        code:"US",
+        name:"미국",
+        capital:"워싱턴 D.C.",
+        capitalClimate:"온난습윤기후(Cfa)",
+        population:"약 3억 4천만 명",
+        populationRank:3,
+        area:"9,833,520㎢",
+        areaRank:4,
+        language:"영어",
+        religion:"기독교 문화 전통이 크며 매우 다양함",
+        food:"햄버거, 바비큐, 핫도그",
+        festival:"독립기념일 행사, 추수감사절 퍼레이드",
+        hint:"북아메리카의 큰 나라이다. 캐나다와 멕시코 사이에 있고 대서양·태평양을 모두 접한다."
+      },
+      {
+        code:"CA",
+        name:"캐나다",
+        capital:"오타와",
+        capitalClimate:"냉대습윤기후(Dfb)",
+        population:"약 4,100만 명",
+        populationRank:35,
+        area:"9,984,670㎢",
+        areaRank:2,
+        language:"영어, 프랑스어",
+        religion:"기독교 문화 전통, 다문화 사회",
+        food:"푸틴, 메이플 시럽 음식",
+        festival:"퀘벡 윈터 카니발",
+        hint:"북아메리카 북쪽에 있다. 미국의 위쪽에 있으며 매우 넓다."
+      },
+      {
+        code:"MX",
+        name:"멕시코",
+        capital:"멕시코시티",
+        capitalClimate:"온난고산기후(Cwb)",
+        population:"약 1억 3,000만 명",
+        populationRank:10,
+        area:"1,964,375㎢",
+        areaRank:13,
+        language:"스페인어",
+        religion:"가톨릭 문화 전통",
+        food:"타코, 엔칠라다, 과카몰리",
+        festival:"죽은 자들의 날",
+        hint:"북아메리카 남쪽에 있다. 미국과 중앙아메리카 사이를 잇는 나라이다."
+      },
+      {
+        code:"BR",
+        name:"브라질",
+        capital:"브라질리아",
+        capitalClimate:"열대사바나기후(Aw)",
+        population:"약 2억 1천만 명",
+        populationRank:7,
+        area:"8,515,767㎢",
+        areaRank:5,
+        language:"포르투갈어",
+        religion:"가톨릭 비중이 크다",
+        food:"페이조아다, 슈하스코",
+        festival:"리우 카니발",
+        hint:"남아메리카에서 가장 큰 나라이다. 대서양을 접하고 많은 남미 국가들과 국경을 맞댄다."
+      },
+      {
+        code:"AR",
+        name:"아르헨티나",
+        capital:"부에노스아이레스",
+        capitalClimate:"온난습윤기후(Cfa)",
+        population:"약 4,700만 명",
+        populationRank:32,
+        area:"2,780,400㎢",
+        areaRank:8,
+        language:"스페인어",
+        religion:"가톨릭 문화 전통",
+        food:"아사도, 엠파나다",
+        festival:"탱고 페스티벌",
+        hint:"남아메리카 남쪽에 있다. 칠레의 동쪽에 길게 맞닿아 있는 큰 나라이다."
+      },
+      {
+        code:"CL",
+        name:"칠레",
+        capital:"산티아고",
+        capitalClimate:"스텝기후(BSk)",
+        population:"약 2,000만 명",
+        populationRank:65,
+        area:"756,102㎢",
+        areaRank:37,
+        language:"스페인어",
+        religion:"가톨릭 문화 전통",
+        food:"엠파나다, 파스텔 데 초클로",
+        festival:"피에스타 파트리아스",
+        hint:"남아메리카 서쪽 해안을 따라 매우 길고 좁게 뻗은 나라이다."
+      },
+      {
+        code:"PE",
+        name:"페루",
+        capital:"리마",
+        capitalClimate:"사막기후(BWh)",
+        population:"약 3,500만 명",
+        populationRank:41,
+        area:"1,285,216㎢",
+        areaRank:19,
+        language:"스페인어, 케추아어",
+        religion:"가톨릭 문화 전통",
+        food:"세비체, 로모 살타도",
+        festival:"인티 라이미",
+        hint:"남아메리카 서부에 있다. 태평양 연안이며 에콰도르, 콜롬비아, 브라질, 칠레와 가깝다."
+      },
+      {
+        code:"AU",
+        name:"오스트레일리아",
+        capital:"캔버라",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 2,700만 명",
+        populationRank:55,
+        area:"7,692,024㎢",
+        areaRank:6,
+        language:"영어",
+        religion:"기독교 문화 전통, 다문화 사회",
+        food:"미트파이, 바비큐",
+        festival:"비비드 시드니",
+        hint:"남반구의 대륙 국가이다. 인도양과 태평양 사이에 홀로 크게 자리한다."
+      },
+      {
+        code:"NZ",
+        name:"뉴질랜드",
+        capital:"웰링턴",
+        capitalClimate:"서안해양성기후(Cfb)",
+        population:"약 520만 명",
+        populationRank:124,
+        area:"268,838㎢",
+        areaRank:75,
+        language:"영어, 마오리어",
+        religion:"기독교 문화 전통, 세속화 경향",
+        food:"피시앤칩스, 파블로바",
+        festival:"마타리키",
+        hint:"오스트레일리아의 남동쪽 바다 건너에 있는 섬나라이다."
+      },
+      {
+        code:"TH",
+        name:"태국",
+        capital:"방콕",
+        capitalClimate:"열대사바나기후(Aw)",
+        population:"약 7,100만 명",
+        populationRank:23,
+        area:"513,120㎢",
+        areaRank:50,
+        language:"태국어",
+        religion:"불교 비중이 매우 높다",
+        food:"팟타이, 똠얌꿍",
+        festival:"송끄란, 러이끄라통",
+        hint:"동남아시아 본토에 있다. 미얀마, 라오스, 캄보디아, 말레이시아와 접한다."
+      },
+      {
+        code:"VN",
+        name:"베트남",
+        capital:"하노이",
+        capitalClimate:"온난습윤기후(Cwa)",
+        population:"약 1억 명",
+        populationRank:15,
+        area:"331,212㎢",
+        areaRank:65,
+        language:"베트남어",
+        religion:"불교·민간신앙·가톨릭 등",
+        food:"쌀국수, 반미",
+        festival:"뗏",
+        hint:"동남아시아의 길쭉한 나라이다. 중국 남쪽, 라오스와 캄보디아의 동쪽에 있다."
+      },
+      {
+        code:"ID",
+        name:"인도네시아",
+        capital:"자카르타",
+        capitalClimate:"열대몬순기후(Am)",
+        population:"약 2억 8천만 명",
+        populationRank:4,
+        area:"1,904,569㎢",
+        areaRank:14,
+        language:"인도네시아어",
+        religion:"이슬람교가 다수",
+        food:"나시고렝, 사테",
+        festival:"이둘피트리 행사, 와양 문화축제",
+        hint:"동남아시아의 विशाल한 군도 국가이다. 적도 부근에 길게 퍼져 있다."
+      },
+      {
+        code:"MN",
+        name:"몽골",
+        capital:"울란바토르",
+        capitalClimate:"스텝기후(BSk)",
+        population:"약 350만 명",
+        populationRank:135,
+        area:"1,564,116㎢",
+        areaRank:18,
+        language:"몽골어",
+        religion:"티베트 불교의 영향",
+        food:"허르헉, 보즈",
+        festival:"나담 축제",
+        hint:"동아시아 내륙에 있다. 북쪽은 러시아, 남쪽은 중국과 맞닿은 나라이다."
+      }
     ];
 
-    let map;
+    let map = null;
     let questions = [];
     let currentIndex = 0;
     let score = 0;
     let gameStarted = false;
+    let gameFinished = false;
     let locked = false;
+    let hintOpened = false;
 
-    const targetCountryEl = document.getElementById("target-country");
-    const scoreEl = document.getElementById("score");
-    const progressEl = document.getElementById("progress");
-    const statusEl = document.getElementById("status");
+    let timerInterval = null;
+    let elapsedSeconds = 0;
 
     function shuffle(array) {
-      const copied = [...array];
-      for (let i = copied.length - 1; i > 0; i--) {
+      const newArr = [...array];
+      for (let i = newArr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [copied[i], copied[j]] = [copied[j], copied[i]];
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
       }
-      return copied;
+      return newArr;
     }
 
     function setStatus(message, type = "info") {
-      statusEl.className = "status " + type;
+      const statusEl = document.getElementById("status");
+      statusEl.className = `status ${type}`;
       statusEl.textContent = message;
     }
 
+    function formatTime(totalSeconds) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const mm = String(minutes).padStart(2, "0");
+      const ss = String(seconds).padStart(2, "0");
+
+      if (hours > 0) {
+        const hh = String(hours).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      }
+      return `${mm}:${ss}`;
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById("timer").textContent = formatTime(elapsedSeconds);
+    }
+
+    function startTimer() {
+      stopTimer();
+      elapsedSeconds = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function resetTimer() {
+      stopTimer();
+      elapsedSeconds = 0;
+      updateTimerDisplay();
+    }
+
     function updateUI() {
-      if (!gameStarted || !questions[currentIndex]) {
-        targetCountryEl.textContent = "게임 시작 버튼을 누르세요";
-      } else {
-        targetCountryEl.textContent = questions[currentIndex].name;
+      let progressText = `0 / ${GAME_SIZE}`;
+
+      if (questions.length > 0) {
+        if (gameFinished) {
+          progressText = `${questions.length} / ${questions.length}`;
+        } else if (gameStarted) {
+          progressText = `${currentIndex + 1} / ${questions.length}`;
+        }
       }
 
-      scoreEl.textContent = score + "점";
-      progressEl.textContent = Math.min(currentIndex, questions.length) + " / " + questions.length;
+      document.getElementById("progress").textContent = progressText;
+      document.getElementById("score").textContent = `${score}점`;
+    }
+
+    function resetCard() {
+      document.getElementById("card-flag-img").src = "";
+      document.getElementById("card-flag-img").alt = "국기 이미지";
+      document.getElementById("card-name").textContent = "어느 나라일까요?";
+      document.getElementById("card-sub").textContent = "국기와 국가 정보를 읽고 지도에서 맞는 나라를 클릭해 보세요.";
+      document.getElementById("card-capital").textContent = "-";
+      document.getElementById("card-language").textContent = "-";
+      document.getElementById("card-population").textContent = "-";
+      document.getElementById("card-area").textContent = "-";
+      document.getElementById("card-religion").textContent = "-";
+      document.getElementById("card-food").textContent = "-";
+      document.getElementById("card-festival").textContent = "-";
+      document.getElementById("hintClosedText").textContent = "클릭해서 위치 힌트 보기";
+      document.getElementById("hintHiddenText").textContent = "-";
+      document.getElementById("hintBox").classList.remove("open");
+    }
+
+    function renderCountryCard(country) {
+      const flagImg = document.getElementById("card-flag-img");
+      flagImg.src = `https://flagcdn.com/w160/${country.code.toLowerCase()}.png`;
+      flagImg.alt = `${country.name} 국기`;
+      flagImg.onerror = function () {
+        this.src = `https://flagcdn.com/w80/${country.code.toLowerCase()}.png`;
+      };
+
+      document.getElementById("card-name").textContent = "이 나라는 어디일까요?";
+      document.getElementById("card-sub").textContent = "국기와 정보를 읽고 세계지도에서 해당 국가를 클릭하세요.";
+
+      document.getElementById("card-capital").textContent =
+        `${country.capital} / ${country.capitalClimate}`;
+
+      document.getElementById("card-language").textContent = country.language;
+
+      document.getElementById("card-population").textContent =
+        `${country.population} / 세계 ${country.populationRank}위`;
+
+      document.getElementById("card-area").textContent =
+        `${country.area} / 세계 ${country.areaRank}위`;
+
+      document.getElementById("card-religion").textContent = country.religion;
+      document.getElementById("card-food").textContent = country.food;
+      document.getElementById("card-festival").textContent = country.festival;
+      document.getElementById("hintClosedText").textContent = "클릭해서 위치 힌트 보기";
+      document.getElementById("hintHiddenText").textContent = country.hint;
+      document.getElementById("hintBox").classList.remove("open");
+    }
+
+    function showCurrentQuestion() {
+      if (!questions.length || currentIndex >= questions.length) return;
+      hintOpened = false;
+      const current = questions[currentIndex];
+      renderCountryCard(current);
+      updateUI();
+    }
+
+    function toggleHintBox() {
+      if (!gameStarted || gameFinished || !questions.length) return;
+      const hintBox = document.getElementById("hintBox");
+      hintBox.classList.toggle("open");
+
+      if (hintBox.classList.contains("open")) {
+        hintOpened = true;
+        document.getElementById("hintClosedText").textContent = "위치 힌트";
+      } else {
+        document.getElementById("hintClosedText").textContent = "클릭해서 위치 힌트 보기";
+      }
     }
 
     function startGame() {
-      questions = shuffle(quizPool);
+      questions = shuffle(quizPool).slice(0, GAME_SIZE);
       currentIndex = 0;
       score = 0;
       gameStarted = true;
+      gameFinished = false;
       locked = false;
-      updateUI();
-      setStatus("지도의 나라를 클릭해 보세요!", "info");
+      hintOpened = false;
+      startTimer();
+      showCurrentQuestion();
+      setStatus("국가 카드를 읽고 지도에서 해당 국가를 클릭하세요.", "info");
     }
 
     function restartGame() {
       startGame();
-      setStatus("새 게임이 시작되었습니다!", "info");
     }
 
     function finishGame() {
       gameStarted = false;
+      gameFinished = true;
       locked = false;
-      targetCountryEl.textContent = "게임 종료";
-      progressEl.textContent = questions.length + " / " + questions.length;
-      setStatus("🎉 게임 완료! 최종 점수: " + score + " / " + questions.length, "success");
+      stopTimer();
+      updateUI();
+
+      setStatus(
+        `게임 종료! 총점 ${score}점 / 경과 시간 ${formatTime(elapsedSeconds)} / 다시 시작 버튼으로 새 게임을 할 수 있어요.`,
+        "success"
+      );
     }
 
     function nextQuestion() {
+      currentIndex++;
       if (currentIndex >= questions.length) {
         finishGame();
         return;
       }
-      updateUI();
-      setStatus("다음 나라를 찾아 클릭하세요!", "info");
-    }
-
-    function showHint() {
-      if (!gameStarted || !questions[currentIndex]) {
-        setStatus("먼저 게임을 시작하세요.", "error");
-        return;
-      }
-      setStatus("힌트: " + questions[currentIndex].hint, "info");
+      showCurrentQuestion();
     }
 
     function handleRegionClick(code) {
-      if (!gameStarted) {
-        setStatus("먼저 게임 시작 버튼을 눌러 주세요.", "error");
-        return;
-      }
+      if (!gameStarted || gameFinished || locked || !questions.length) return;
 
-      if (locked) return;
-
+      const clickedCode = String(code).toUpperCase();
       const current = questions[currentIndex];
-      if (!current) return;
 
-      if (code === current.code) {
+      if (clickedCode === current.code) {
         locked = true;
-        score++;
-        currentIndex++;
+        const earned = hintOpened ? 4 : 5;
+        score += earned;
         updateUI();
-        setStatus("✅ 정답입니다!", "success");
 
-        setTimeout(function () {
+        setStatus(
+          `정답! 이 나라는 ${current.name}입니다. ${hintOpened ? "힌트를 봐서 4점 획득!" : "힌트 없이 맞혀서 5점 획득!"}`,
+          "success"
+        );
+
+        setTimeout(() => {
           locked = false;
-          if (currentIndex >= questions.length) {
-            finishGame();
-          } else {
-            nextQuestion();
-          }
+          nextQuestion();
         }, 900);
       } else {
-        setStatus("❌ 틀렸어요. 다시 찾아보세요.", "error");
+        setStatus("틀렸어요. 카드 정보를 다시 읽고 지도에서 다시 찾아보세요.", "error");
       }
     }
 
@@ -399,21 +1229,22 @@
         map: "world",
         zoomButtons: true,
         zoomOnScroll: true,
-        backgroundColor: "#dbeafe",
         regionStyle: {
           initial: {
-            fill: "#93c5fd",
+            fill: "#c7d2fe",
             stroke: "#ffffff",
-            strokeWidth: 1
+            strokeWidth: 0.8,
+            fillOpacity: 1
           },
           hover: {
-            fill: "#2563eb",
+            fill: "#60a5fa",
             cursor: "pointer"
           },
           selected: {
-            fill: "#22c55e"
+            fill: "#2563eb"
           }
         },
+        backgroundColor: "#dbeafe",
         onRegionClick: function (event, code) {
           handleRegionClick(code);
         }
@@ -422,6 +1253,8 @@
 
     initMap();
     updateUI();
+    resetCard();
+    resetTimer();
   </script>
 </body>
 </html>
